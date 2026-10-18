@@ -104,6 +104,16 @@ if (-not (Test-Path -LiteralPath (Join-Path $dist 'index.html'))) { throw "No SP
 # Guard: the build must not contain a JWT (a token baked in from an env file would be served to every browser).
 $leak = Get-ChildItem -LiteralPath (Join-Path $dist 'assets') -Filter *.js | Select-String -Pattern 'eyJ[A-Za-z0-9_-]{10,}\.eyJ' -List
 if ($leak) { throw "The SPA build contains what looks like a JWT ($($leak[0].Filename)). Check the FE env files." }
+# The gateway serves its OWN copy of the build. apps/web/dist is rewritten by every ordinary `npm run build`
+# (other sessions, CI checks) and such a build lacks the devgateway mode, which once left the sign-in page
+# saying "VITE_IDENTITY_AUTHORITY is not set". Only this script writes C:\devgw\spa.
+$spaCopy = Join-Path $DevGw.ScratchRoot 'spa'
+if (-not $SkipSpaBuild -or -not (Test-Path -LiteralPath (Join-Path $spaCopy 'index.html'))) {
+    New-Item -ItemType Directory -Force -Path $spaCopy | Out-Null
+    & robocopy $dist $spaCopy /MIR /R:2 /W:2 /NFL /NDL /NJH /NJS /NP | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "Copying the SPA build to $spaCopy failed (robocopy exit $LASTEXITCODE)." }
+}
+$dist = $spaCopy   # from here on nginx's spa junction points at the gateway's private copy
 
 # ---------- 2. Legacy build ----------
 Step 'Legacy build (workspace copy -> C:\devgw\legacy, MSBuild 14 Release)'
