@@ -355,6 +355,12 @@ public sealed class NewShape
     /// <summary>rows: dotted property path to the array for each legacy table, in the order of legacyShape.tables; "" means the body itself.</summary>
     public List<string> RowsPaths { get; init; } = [];
 
+    /// <summary>
+    /// rows: the new endpoint returns ONE object (a lookup by key) where the legacy action returned a table of 0 or 1 rows.
+    /// The object is compared as a one-row list and an HTTP 404 from the new endpoint counts as an empty list.
+    /// </summary>
+    public bool SingleRow { get; init; }
+
     internal void Validate(string source)
     {
         if (!Kind.Equals(Json, StringComparison.OrdinalIgnoreCase) && !Kind.Equals(Rows, StringComparison.OrdinalIgnoreCase))

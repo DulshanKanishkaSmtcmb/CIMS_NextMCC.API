@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getPortData -> GET api/v1/master-data/ports/{code}   (Ports master page, legacy docs/15)
+  "legacy": { "controller": "DataApi", "action": "getPortData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/ports/{code}" },
+
+  // strData=[{"PortCode":"DEL","strRtnPara":"[]"}] (the existence check also sends "strCodeType":"Code", which is ignored).
+  "queryJson": { "strData": { "PortCode": "code", "strRtnPara": null, "strCodeType": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "An empty code cannot be replayed (an empty route segment is the list endpoint); the page never sends one."
+}

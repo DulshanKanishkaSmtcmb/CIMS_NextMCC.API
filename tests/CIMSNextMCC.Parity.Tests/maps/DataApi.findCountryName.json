@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/findCountryName -> GET api/v1/master-data/countries/search   (Country master page, legacy docs/15)
+  "legacy": { "controller": "DataApi", "action": "findCountryName", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/countries/search" },
+
+  // strName=<typed text>&isStartChrOnly=true&strRtnPara=<box layout JSON>; the layout is a page detail the API does not take.
+  "query": { "strName": "name", "isStartChrOnly": "startsWith", "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "CountryCode, CountryName, CargoMovement ordered by CountryName on both sides."
+}

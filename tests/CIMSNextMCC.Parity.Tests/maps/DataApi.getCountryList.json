@@ -1,8 +1,10 @@
 {
-  // Legacy DataApi/getCountryList -> GET api/v1/arrivals/confirm/countries   (Confirm Arrivals pilot, legacy docs/13)
+  // Legacy DataApi/getCountryList -> GET api/v1/master-data/countries   (Country master page, legacy docs/15; also the
+  // "Countries Listing" dialogs of Ports and DC). The Confirm Arrivals pilot map pointed at arrivals/confirm/countries; that
+  // slim lookup is a subset of this response (same SQL, two columns) and is covered by its unit tests.
   "legacy": { "controller": "DataApi", "action": "getCountryList", "method": "GET" },
   "status": "ported",
-  "new": { "method": "GET", "route": "api/v1/arrivals/confirm/countries" },
+  "new": { "method": "GET", "route": "api/v1/master-data/countries" },
 
   // strData=[{"CountryCode":"","strRtnPara":"[]"}]. The legacy action builds a CountryCode filter and never applies it.
   "queryJson": { "strData": { "CountryCode": null, "strRtnPara": null } },
@@ -10,10 +12,7 @@
   "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
   "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
 
-  "options": {
-    // Legacy returns select t1.* from Country; the page reads CountryCode and CountryName.
-    "ignoreColumns": [ "CargoMovement", "DateEnter", "EnterBy", "DateUpdate", "UpdateBy", "ContractBlock" ]
-  },
+  "options": {},
 
-  "notes": "Compares CountryCode and CountryName in order (ORDER BY CountryCode on both sides)."
+  "notes": "All eight Country columns, in ORDER BY CountryCode order on both sides."
 }

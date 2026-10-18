@@ -142,3 +142,46 @@ public class NormalizerTests
         Assert.Throws<NormalizationException>(() => Normalizer.Canonicalize("""{"A":1,"a":2}"""));
     }
 }
+
+public class SingleRowLookupTests
+{
+    private const string LookupMap = """
+        {
+          "legacy": { "controller": "DataApi", "action": "getCountryData" },
+          "new": { "route": "api/v1/master-data/countries/{code}" },
+          "queryJson": { "strData": { "CountryCode": "code", "strRtnPara": null } },
+          "legacyShape": { "kind": "dataRtnCls", "tables": ["dtMain"] },
+          "newShape": { "kind": "rows", "rowsPaths": [""], "singleRow": true }
+        }
+        """;
+
+    [Fact]
+    public void A_single_object_is_compared_as_a_one_row_list()
+    {
+        var map = EndpointMap.Parse(LookupMap);
+
+        var legacy = Normalizer.CanonicalizeLegacy("""{"dtMain":[{"CountryCode":"IND","CountryName":"INDIA"}]}""", map);
+        var current = Normalizer.CanonicalizeNew("""{"countryCode":"IND","countryName":"INDIA"}""", map);
+
+        Assert.Equal(legacy, current);
+    }
+
+    [Fact]
+    public void An_object_that_differs_is_reported()
+    {
+        var map = EndpointMap.Parse(LookupMap);
+
+        var legacy = Normalizer.CanonicalizeLegacy("""{"dtMain":[{"CountryCode":"IND","CountryName":"INDIA"}]}""", map);
+        var current = Normalizer.CanonicalizeNew("""{"countryCode":"IND","countryName":"India"}""", map);
+
+        Assert.NotEqual(legacy, current);
+    }
+
+    [Fact]
+    public void An_object_without_single_row_is_still_an_error()
+    {
+        var map = EndpointMap.Parse(LookupMap.Replace(", \"singleRow\": true", string.Empty));
+
+        Assert.Throws<NormalizationException>(() => Normalizer.CanonicalizeNew("""{"countryCode":"IND"}""", map));
+    }
+}

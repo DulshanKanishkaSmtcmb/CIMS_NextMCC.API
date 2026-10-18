@@ -121,7 +121,7 @@ public static class Normalizer
             for (var i = 0; i < tables.Count; i++)
             {
                 var element = ResolvePath(doc.RootElement, shape.RowsPaths[i]);
-                byTable[tables[i].ToLowerInvariant()] = CanonicalRows(element, options, columnMap: null, $"new rows at '{shape.RowsPaths[i]}'");
+                byTable[tables[i].ToLowerInvariant()] = CanonicalRows(element, options, columnMap: null, $"new rows at '{shape.RowsPaths[i]}'", shape.SingleRow);
             }
 
             result = tables.Count == 1 ? byTable[tables[0].ToLowerInvariant()] : byTable;
@@ -184,11 +184,16 @@ public static class Normalizer
         return current;
     }
 
-    private static JsonNode CanonicalRows(JsonElement table, NormalizeOptions options, Dictionary<string, string>? columnMap, string what)
+    private static JsonNode CanonicalRows(JsonElement table, NormalizeOptions options, Dictionary<string, string>? columnMap, string what, bool singleRow = false)
     {
         if (table.ValueKind == JsonValueKind.Null)
         {
             return new JsonArray();
+        }
+
+        if (singleRow && table.ValueKind == JsonValueKind.Object)
+        {
+            return new JsonArray(Canonicalize(table, options, columnMap));
         }
 
         if (table.ValueKind != JsonValueKind.Array)

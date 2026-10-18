@@ -158,6 +158,12 @@ public sealed class ParityRunner : IDisposable
             }
 
             var (newStatus, newBody) = await SendAsync(_new, new Uri(_newBase, newUrl), legacy: false, ct);
+            if (newStatus == 404 && map.NewShape.SingleRow)
+            {
+                // A lookup by key: "no such row" is a 404 on the new side and an empty table on the legacy side.
+                (newStatus, newBody) = (200, "[]");
+            }
+
             if (newStatus is < 200 or >= 300)
             {
                 return new CallResult(call, count, ParityOutcome.Error, endpoint,

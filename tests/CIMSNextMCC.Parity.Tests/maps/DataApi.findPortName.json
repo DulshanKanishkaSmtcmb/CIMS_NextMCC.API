@@ -1,0 +1,15 @@
+{
+  // Legacy DataApi/findPortName -> GET api/v1/master-data/ports/search   (Ports master page, legacy docs/15)
+  "legacy": { "controller": "DataApi", "action": "findPortName", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/ports/search" },
+
+  "query": { "strName": "name", "isStartChrOnly": "startsWith", "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "PortCode, PortName, CountryCode ordered by PortName on both sides."
+}

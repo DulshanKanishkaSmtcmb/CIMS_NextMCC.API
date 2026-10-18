@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getDCData -> GET api/v1/master-data/dcs/{whDes}   (DC master page, legacy docs/15)
+  "legacy": { "controller": "DataApi", "action": "getDCData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/dcs/{whDes}" },
+
+  // strData=[{"WhDes":"JO JO WEB","strRtnPara":"[]"}] (the existence check also sends "strCodeType":"Code", which is ignored).
+  "queryJson": { "strData": { "WhDes": "whDes", "strRtnPara": null, "strCodeType": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "An empty name cannot be replayed (an empty route segment is the list endpoint); the page never sends one."
+}

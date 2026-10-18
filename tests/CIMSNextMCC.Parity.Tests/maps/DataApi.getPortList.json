@@ -1,0 +1,17 @@
+{
+  // Legacy DataApi/getPortList -> GET api/v1/master-data/ports   (Ports master page, legacy docs/15)
+  "legacy": { "controller": "DataApi", "action": "getPortList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/ports" },
+
+  // strData=[{"strRtnPara":"[]","PortCode":"","CountryCode":""}]. The legacy PortCode filter is commented out; CountryCode is
+  // applied when it is not empty.
+  "queryJson": { "strData": { "PortCode": null, "strRtnPara": null, "CountryCode": "countryCode" } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "All nine Ports columns, in ORDER BY PortCode order on both sides."
+}
