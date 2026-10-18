@@ -41,6 +41,54 @@ public class EndpointMapTests
         Assert.Equal("api/v1/x?bookingNo=A%2FB%201", request.ToRelativeUrl());
     }
 
+    private const string JsonMap = """
+        {
+          "legacy": { "controller": "DataApi", "action": "getPending" },
+          "new": { "route": "api/v1/arrivals/confirm/pending" },
+          "query": { "uid": null },
+          "queryJson": { "strData": { "strCargoFrom": "cargoFrom", "strDC": "dc", "strCountry": "country", "strMode": null, "strArrivalDate": null, "uid": null } }
+        }
+        """;
+
+    [Fact]
+    public void A_json_query_parameter_is_split_and_mapped_property_by_property()
+    {
+        var map = EndpointMap.Parse(JsonMap);
+        var strData = Uri.EscapeDataString("""[{"strMode":"Sea","strArrivalDate":"","strCountry":"All","uid":"x","strDC":"All","strCargoFrom":"Import"}]""");
+
+        var request = map.BuildNewRequest(Call("/api/DataApi/getPending", $"strData={strData}&uid=x&_=1"));
+
+        Assert.Equal("api/v1/arrivals/confirm/pending?country=All&dc=All&cargoFrom=Import", request.ToRelativeUrl());
+    }
+
+    [Fact]
+    public void A_json_object_is_accepted_and_an_empty_value_or_array_yields_nothing()
+    {
+        var map = EndpointMap.Parse(JsonMap);
+        Assert.Equal("api/v1/arrivals/confirm/pending?dc=X",
+            map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=" + Uri.EscapeDataString("""{"strDC":"X"}"""))).ToRelativeUrl());
+        Assert.Equal("api/v1/arrivals/confirm/pending", map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=%5B%5D")).ToRelativeUrl());
+        Assert.Equal("api/v1/arrivals/confirm/pending", map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=")).ToRelativeUrl());
+    }
+
+    [Fact]
+    public void An_unlisted_json_property_and_bad_json_are_errors()
+    {
+        var map = EndpointMap.Parse(JsonMap);
+        var ex = Assert.Throws<UnmappedParameterException>(() =>
+            map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=" + Uri.EscapeDataString("""[{"strNew":"1"}]"""))));
+        Assert.Contains("strData.strNew", ex.Message);
+        Assert.Throws<InvalidOperationException>(() => map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=%7Bnope")));
+        Assert.Throws<InvalidOperationException>(() => map.BuildNewRequest(Call("/api/DataApi/getPending", "strData=5")));
+    }
+
+    [Fact]
+    public void A_parameter_cannot_be_under_both_query_and_query_json() =>
+        Assert.Throws<InvalidDataException>(() => EndpointMap.Parse("""
+            { "legacy": { "controller": "A", "action": "b" }, "new": { "route": "r" },
+              "query": { "strData": null }, "queryJson": { "STRDATA": { "x": "y" } } }
+            """));
+
     [Fact]
     public void An_unlisted_query_parameter_is_an_error_not_silently_forwarded()
     {

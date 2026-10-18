@@ -29,6 +29,14 @@ public sealed class EndpointMap
     /// </summary>
     public Dictionary<string, string?> Query { get; init; } = new();
 
+    /// <summary>
+    /// Legacy query parameters that carry a JSON array/object (most DataApi reads: strData=[{...}]). Key = the legacy
+    /// parameter name (case-insensitive), value = JSON property (case-insensitive) to new query name; null drops the
+    /// property, an unlisted property is an error. The parameter itself is consumed and must not also appear in
+    /// <see cref="Query"/>.
+    /// </summary>
+    public Dictionary<string, Dictionary<string, string?>> QueryJson { get; init; } = new();
+
     /// <summary>Query parameters always sent to the new endpoint.</summary>
     public Dictionary<string, string> ConstantQuery { get; init; } = new();
 
@@ -66,6 +74,17 @@ public sealed class EndpointMap
         var newQuery = new List<(string Name, string Value)>();
         foreach (var (name, value) in legacyParams)
         {
+            if (QueryJson.TryGetValue(name, out var propertyMap))
+            {
+                foreach (var (newJsonName, jsonValue) in ExpandJsonParameter(name, value, propertyMap))
+                {
+                    mapped[newJsonName] = jsonValue;
+                    newQuery.Add((newJsonName, jsonValue));
+                }
+
+                continue;
+            }
+
             if (!Query.TryGetValue(name, out var newName))
             {
                 if (DefaultDroppedParameters.Contains(name, StringComparer.OrdinalIgnoreCase))
@@ -104,6 +123,71 @@ public sealed class EndpointMap
         }
 
         return new NewRequest(New.Method, route, newQuery);
+    }
+
+    /// <summary>
+    /// Splits a legacy parameter that carries JSON (e.g. strData=[{"strDC":"All",...}]): the value is parsed as a JSON
+    /// array (first element) or object, and each property is mapped like a <see cref="Query"/> entry. A property that is
+    /// not listed is an error; an empty parameter value yields nothing. Property values are sent as text (strings as
+    /// they are, numbers invariant, booleans true/false, null as an empty string); empty values are still sent, so drop
+    /// the property (null) when the new API should not see it.
+    /// </summary>
+    private IEnumerable<(string Name, string Value)> ExpandJsonParameter(string parameter, string json, Dictionary<string, string?> propertyMap)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            yield break;
+        }
+
+        System.Text.Json.JsonElement element;
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            element = doc.RootElement.Clone();
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            throw new InvalidOperationException($"{Key}: query parameter '{parameter}' is not valid JSON ({ex.Message}).");
+        }
+
+        if (element.ValueKind == System.Text.Json.JsonValueKind.Array)
+        {
+            if (element.GetArrayLength() == 0)
+            {
+                yield break;
+            }
+
+            element = element[0];
+        }
+
+        if (element.ValueKind != System.Text.Json.JsonValueKind.Object)
+        {
+            throw new InvalidOperationException($"{Key}: query parameter '{parameter}' must be a JSON object or an array of objects.");
+        }
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (!propertyMap.TryGetValue(property.Name, out var newName))
+            {
+                throw new UnmappedParameterException(Key, $"{parameter}.{property.Name}");
+            }
+
+            if (newName is null)
+            {
+                continue;
+            }
+
+            var text = property.Value.ValueKind switch
+            {
+                System.Text.Json.JsonValueKind.String => property.Value.GetString() ?? string.Empty,
+                System.Text.Json.JsonValueKind.Number => property.Value.GetRawText(),
+                System.Text.Json.JsonValueKind.True => "true",
+                System.Text.Json.JsonValueKind.False => "false",
+                System.Text.Json.JsonValueKind.Null => string.Empty,
+                _ => throw new InvalidOperationException($"{Key}: '{parameter}.{property.Name}' is a nested JSON value, which queryJson does not support."),
+            };
+            yield return (newName, text);
+        }
     }
 
     private static IEnumerable<string> RoutePlaceholders(string route)
@@ -150,6 +234,10 @@ public sealed class EndpointMap
             Status = map.Status.ToLowerInvariant(),
             New = map.New,
             Query = new Dictionary<string, string?>(map.Query, StringComparer.OrdinalIgnoreCase),
+            QueryJson = map.QueryJson.ToDictionary(
+                e => e.Key,
+                e => new Dictionary<string, string?>(e.Value, StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase),
             ConstantQuery = map.ConstantQuery,
             LegacyShape = map.LegacyShape,
             NewShape = map.NewShape,
@@ -169,6 +257,14 @@ public sealed class EndpointMap
         if (!string.Equals(Legacy.Method, "GET", StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidDataException(Fail("v1 only supports legacy.method GET."));
+        }
+
+        foreach (var name in QueryJson.Keys)
+        {
+            if (Query.Keys.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(Fail($"'{name}' is listed under both 'query' and 'queryJson'."));
+            }
         }
 
         var status = Status.ToLowerInvariant();
