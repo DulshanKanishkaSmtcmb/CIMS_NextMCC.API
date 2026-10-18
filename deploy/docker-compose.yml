@@ -1,0 +1,27 @@
+services:
+  nextmcc-api:
+    image: ghcr.io/speedmark-transportation-lanka-pvt-ltd/cims-nextmcc-api:latest
+    container_name: ${PROJECT_NAME}-api
+    restart: unless-stopped
+    ports:
+      - "${INTERNAL_PROXY_PORT:-5021}:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - EnableSwagger=${ENABLE_SWAGGER:-false}
+      - PROJECT_NAME=${PROJECT_NAME}
+      - COMPOSE_PROJECT_NAME=${PROJECT_NAME}
+      - Identity__Authority=${IDENTITY_AUTHORITY:-}
+      - Authorization__LogOnly=${AUTHORIZATION_LOG_ONLY:-true}
+      - Cors__AllowedOrigins__0=${CORS_ORIGIN_0:-}
+      # Connection strings come from the host environment (or the pipeline's secret variables), never from this file.
+      # Tenants__0 = NextMCC. Tenants__1 (NextCFS) is added when Phase 2T starts.
+      - Tenants__0__ConnectionStrings__Main=${NEXTMCC_CS_MAIN:-}
+      - Tenants__0__ConnectionStrings__Cfs=${NEXTMCC_CS_CFS:-}
+      - Tenants__0__ConnectionStrings__Air=${NEXTMCC_CS_AIR:-}
+      - Tenants__0__ConnectionStrings__Sea=${NEXTMCC_CS_SEA:-}
+    networks:
+      - nat
+
+networks:
+  nat:
+    external: true

@@ -1,0 +1,18 @@
+@host = http://localhost:5212
+# Paste an access token issued by CIMS Identity (audience cims-nextmcc-api, scope cims.nextmcc, with a "tenant" claim).
+@token = <paste-access-token-here>
+# Optional: only honoured if this value is listed in the token's "tenants" claim, otherwise 403.
+@tenant = NextMCC
+
+### Health (anonymous)
+GET {{host}}/health
+
+### Field captions (replaces legacy DataApi/getfldParas)
+GET {{host}}/api/v1/reference/field-captions
+Authorization: Bearer {{token}}
+X-Tenant: {{tenant}}
+Accept: application/json
+
+### Legacy cookie bridge (spike: returns 501 until docs/09 section 4.3 is implemented)
+POST {{host}}/api/v1/legacy-session
+Authorization: Bearer {{token}}

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- DefaultHttpContext and authorization types used by the tenancy / menu tests. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CIMSNextMCC.API\CIMSNextMCC.API.csproj" />
+    <ProjectReference Include="..\..\src\CIMSNextMCC.Application\CIMSNextMCC.Application.csproj" />
+    <ProjectReference Include="..\..\src\CIMSNextMCC.Domain\CIMSNextMCC.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CIMSNextMCC.Infrastructure\CIMSNextMCC.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

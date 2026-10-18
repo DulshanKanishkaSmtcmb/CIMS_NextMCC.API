@@ -1,0 +1,174 @@
+# Same shape as CIMS.Cargo.API: build and push the image to GHCR, then deploy to the Windows host by branch.
+# Secrets (tenant connection strings) are NOT in this file. Define them as secret pipeline variables or on the host:
+# NEXTMCC_CS_MAIN, NEXTMCC_CS_CFS, NEXTMCC_CS_AIR, NEXTMCC_CS_SEA, IDENTITY_AUTHORITY.
+# To use this file, point the pipeline at deploy/azure-pipelines.yml (or copy it to the repository root).
+
+trigger:
+  branches:
+    include:
+      - main
+      - uat
+      - dev
+
+variables:
+  apiRepository: speedmark-transportation-lanka-pvt-ltd/cims-nextmcc-api
+  buildContext: $(Build.SourcesDirectory)
+
+stages:
+- stage: Build
+  displayName: Build and Push NextMCC API Image
+  jobs:
+  - job: BuildAndPush
+    pool: { name: Default }
+    steps:
+    - task: Docker@2
+      displayName: 'Login to GHCR'
+      inputs:
+        containerRegistry: 'CIMS-GHCR-Connection'
+        command: 'login'
+
+    - task: Docker@2
+      displayName: 'Build and Push NextMCC API'
+      inputs:
+        containerRegistry: 'CIMS-GHCR-Connection'
+        repository: $(apiRepository)
+        command: 'buildAndPush'
+        Dockerfile: 'deploy/Dockerfile'
+        buildContext: $(buildContext)
+        tags: |
+          latest
+          $(Build.BuildId)
+
+- stage: Deploy
+  displayName: Deploy to Windows Host
+  dependsOn: Build
+  condition: succeeded('Build')
+  jobs:
+
+  # -----------------------------------------------------
+  # DEV DEPLOYMENT (Only triggers on 'dev' branch)
+  # ----------------------------------------------------
+  - job: DeployDev
+    displayName: 'Deploy to Dev'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+    pool: { name: Default }
+    variables:
+      targetPath: C:\systems\nextmcc\dev
+      projectName: cims-nextmcc-dev
+      proxyPort: 5021
+    steps:
+    - task: Docker@2
+      displayName: 'Login to GHCR for Pull'
+      inputs:
+        containerRegistry: 'CIMS-GHCR-Connection'
+        command: 'login'
+
+    - task: CopyFiles@2
+      displayName: 'Stage Compose File'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/deploy'
+        Contents: 'docker-compose.yml'
+        TargetFolder: '$(targetPath)'
+        CleanTargetFolder: false
+        OverWrite: true
+
+    - task: PowerShell@2
+      displayName: 'Deploy Dev NextMCC Container'
+      inputs:
+        targetType: 'inline'
+        script: |
+          New-Item -ItemType Directory -Force -Path "$(targetPath)"
+
+          $env:INTERNAL_PROXY_PORT="$(proxyPort)"
+          $env:PROJECT_NAME="$(projectName)"
+          $env:COMPOSE_PROJECT_NAME="$(projectName)"
+          $env:ENABLE_SWAGGER="true"
+
+          Set-Location -Path "$(targetPath)"
+          docker compose pull
+          docker compose up -d --force-recreate
+
+  # ----------------------------------------------------
+  # UAT DEPLOYMENT (Only triggers on 'uat' branch)
+  # ----------------------------------------------------
+  - job: DeployUat
+    displayName: 'Deploy to UAT'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/uat')
+    pool: { name: Default }
+    variables:
+      targetPath: C:\systems\nextmcc\uat
+      projectName: cims-nextmcc-uat
+      proxyPort: 5022
+    steps:
+    - task: Docker@2
+      displayName: 'Login to GHCR for Pull'
+      inputs:
+        containerRegistry: 'CIMS-GHCR-Connection'
+        command: 'login'
+
+    - task: CopyFiles@2
+      displayName: 'Stage Compose File'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/deploy'
+        Contents: 'docker-compose.yml'
+        TargetFolder: '$(targetPath)'
+        CleanTargetFolder: false
+        OverWrite: true
+
+    - task: PowerShell@2
+      displayName: 'Deploy UAT NextMCC Container'
+      inputs:
+        targetType: 'inline'
+        script: |
+          New-Item -ItemType Directory -Force -Path "$(targetPath)"
+
+          $env:INTERNAL_PROXY_PORT="$(proxyPort)"
+          $env:PROJECT_NAME="$(projectName)"
+          $env:COMPOSE_PROJECT_NAME="$(projectName)"
+          $env:ENABLE_SWAGGER="true"
+
+          Set-Location -Path "$(targetPath)"
+          docker compose pull
+          docker compose up -d --force-recreate
+
+  # ----------------------------------------------------
+  # PROD DEPLOYMENT (Only triggers on 'main' branch)
+  # ----------------------------------------------------
+  - job: DeployProd
+    displayName: 'Deploy to Prod'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    pool: { name: Default }
+    variables:
+      targetPath: C:\systems\nextmcc\prod
+      projectName: cims-nextmcc-prod
+      proxyPort: 5023
+    steps:
+    - task: Docker@2
+      displayName: 'Login to GHCR for Pull'
+      inputs:
+        containerRegistry: 'CIMS-GHCR-Connection'
+        command: 'login'
+
+    - task: CopyFiles@2
+      displayName: 'Stage Compose File'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/deploy'
+        Contents: 'docker-compose.yml'
+        TargetFolder: '$(targetPath)'
+        CleanTargetFolder: false
+        OverWrite: true
+
+    - task: PowerShell@2
+      displayName: 'Deploy Prod NextMCC Container'
+      inputs:
+        targetType: 'inline'
+        script: |
+          New-Item -ItemType Directory -Force -Path "$(targetPath)"
+
+          $env:INTERNAL_PROXY_PORT="$(proxyPort)"
+          $env:PROJECT_NAME="$(projectName)"
+          $env:COMPOSE_PROJECT_NAME="$(projectName)"
+
+          Set-Location -Path "$(targetPath)"
+          docker compose pull
+          docker compose up -d --force-recreate
