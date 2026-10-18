@@ -1,5 +1,6 @@
 @host = http://localhost:5212
 # Paste an access token issued by CIMS Identity (audience cims-nextmcc-api, scope cims.nextmcc, with a "tenant" claim).
+# Development without Identity: a local token from `dotnet user-jwts create --scheme DevJwt ...` (see deploy/spike).
 @token = <paste-access-token-here>
 # Optional: only honoured if this value is listed in the token's "tenants" claim, otherwise 403.
 @tenant = NextMCC
@@ -13,6 +14,12 @@ Authorization: Bearer {{token}}
 X-Tenant: {{tenant}}
 Accept: application/json
 
-### Legacy cookie bridge (spike: returns 501 until docs/09 section 4.3 is implemented)
+### Legacy cookie bridge: 204 + Set-Cookie .AspNet.ApplicationCookie (docs/09 section 4.3)
 POST {{host}}/api/v1/legacy-session
 Authorization: Bearer {{token}}
+
+### Legacy cookie bridge: Development only, decodes the incoming legacy cookie
+GET {{host}}/api/v1/legacy-session/inspect
+
+### Legacy cookie bridge: sign out (expired Set-Cookie)
+DELETE {{host}}/api/v1/legacy-session

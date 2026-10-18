@@ -38,4 +38,9 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
 
+  <ItemGroup Label="Legacy cookie bridge tests only: the legacy app's Katana side (delete in Phase 4)">
+    <PackageVersion Include="Microsoft.Owin.Security.Interop" Version="2.3.13" />
+    <PackageVersion Include="Microsoft.Owin.Security" Version="4.2.2" />
+  </ItemGroup>
+
 </Project>

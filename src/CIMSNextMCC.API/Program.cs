@@ -5,6 +5,7 @@ using CIMSNextMCC.API.Middleware;
 using CIMSNextMCC.Application;
 using CIMSNextMCC.Application.Common.Models;
 using CIMSNextMCC.Infrastructure;
+using CIMSNextMCC.Infrastructure.LegacyBridge;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -42,8 +43,35 @@ try
         throw new InvalidOperationException("Identity:Authority is not configured.");
     }
 
-    builder.Services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    // Scope check shared by the Identity tokens and (Development only) the dotnet user-jwts tokens.
+    Task RequireScope(TokenValidatedContext context)
+    {
+        var requiredScope = identitySettings.RequiredScope;
+        if (string.IsNullOrWhiteSpace(requiredScope))
+        {
+            return Task.CompletedTask;
+        }
+
+        var scopes = context.Principal?.Claims
+            .Where(claim => claim.Type is "scope" or "scp")
+            .SelectMany(claim => claim.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+
+        if (!scopes.Contains(requiredScope))
+        {
+            context.Fail($"Required scope '{requiredScope}' is missing.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    // Development: a policy scheme in front of Bearer also accepts locally minted `dotnet user-jwts` tokens.
+    var defaultScheme = builder.Environment.IsDevelopment()
+        ? DevJwtExtensions.SelectorScheme
+        : JwtBearerDefaults.AuthenticationScheme;
+
+    var authentication = builder.Services
+        .AddAuthentication(defaultScheme)
         .AddJwtBearer(options =>
         {
             options.Authority = identitySettings.Authority;
@@ -56,30 +84,15 @@ try
                 ValidateLifetime = true,
                 NameClaimType = "username"
             };
-            options.Events = new JwtBearerEvents
-            {
-                OnTokenValidated = context =>
-                {
-                    var requiredScope = identitySettings.RequiredScope;
-                    if (string.IsNullOrWhiteSpace(requiredScope))
-                    {
-                        return Task.CompletedTask;
-                    }
+            options.Events = new JwtBearerEvents { OnTokenValidated = RequireScope };
+        })
+        // Legacy OWIN cookie for not-yet-migrated pages (docs/09 section 4.3). Never the default scheme.
+        .AddLegacyCookie(builder.Configuration);
 
-                    var scopes = context.Principal?.Claims
-                        .Where(claim => claim.Type is "scope" or "scp")
-                        .SelectMany(claim => claim.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                        .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
-
-                    if (!scopes.Contains(requiredScope))
-                    {
-                        context.Fail($"Required scope '{requiredScope}' is missing.");
-                    }
-
-                    return Task.CompletedTask;
-                }
-            };
-        });
+    if (builder.Environment.IsDevelopment())
+    {
+        authentication.AddDevJwt(RequireScope);
+    }
 
     builder.Services.AddAuthorization(options =>
     {
