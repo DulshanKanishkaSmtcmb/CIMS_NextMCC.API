@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getPMData -> GET api/v1/master-data/pm-masters/{code}   (PM Master page, legacy docs/17)
+  "legacy": { "controller": "DataApi", "action": "getPMData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pm-masters/{code}" },
+
+  // strData=[{"strCode":"CT1","strRtnPara":"[]"}] (the existence check also sends "strCodeType":"Code", which is ignored).
+  "queryJson": { "strData": { "strCode": "code", "strRtnPara": null, "strCodeType": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "An empty code cannot be replayed (an empty route segment is the list endpoint); the page never sends one. Codes longer than 10 characters are refused by the API with 400 (the save procedures take nvarchar(10)); the golden inputs stay within 10."
+}

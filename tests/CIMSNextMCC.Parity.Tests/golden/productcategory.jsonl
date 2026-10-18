@@ -1,0 +1,20 @@
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"","status":200,"body":"","sha256":"","why":"The grid load (no parameters)"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000101","status":200,"body":"","sha256":"","why":"Same call, cache buster 1"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000102","status":200,"body":"","sha256":"","why":"Same call, cache buster 2"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000103","status":200,"body":"","sha256":"","why":"Same call, cache buster 3"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000104","status":200,"body":"","sha256":"","why":"Same call, cache buster 4"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000105","status":200,"body":"","sha256":"","why":"Same call, cache buster 5"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000106","status":200,"body":"","sha256":"","why":"Same call, cache buster 6"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000107","status":200,"body":"","sha256":"","why":"Same call, cache buster 7"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000108","status":200,"body":"","sha256":"","why":"Same call, cache buster 8"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getChainCategoryData","query":"_=1760000000109","status":200,"body":"","sha256":"","why":"Same call, cache buster 9"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"","status":200,"body":"","sha256":"","why":"The Range select load (no parameters)"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000201","status":200,"body":"","sha256":"","why":"Same call, cache buster 1"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000202","status":200,"body":"","sha256":"","why":"Same call, cache buster 2"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000203","status":200,"body":"","sha256":"","why":"Same call, cache buster 3"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000204","status":200,"body":"","sha256":"","why":"Same call, cache buster 4"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000205","status":200,"body":"","sha256":"","why":"Same call, cache buster 5"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000206","status":200,"body":"","sha256":"","why":"Same call, cache buster 6"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000207","status":200,"body":"","sha256":"","why":"Same call, cache buster 7"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000208","status":200,"body":"","sha256":"","why":"Same call, cache buster 8"}
+{"utc":"2026-10-18T00:00:00.000Z","user":"golden","method":"GET","path":"/api/DataApi/getProductCategoryData","query":"_=1760000000209","status":200,"body":"","sha256":"","why":"Same call, cache buster 9"}

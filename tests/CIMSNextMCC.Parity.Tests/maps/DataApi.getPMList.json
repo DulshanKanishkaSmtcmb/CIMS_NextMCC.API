@@ -1,0 +1,17 @@
+{
+  // Legacy DataApi/getPMList -> GET api/v1/master-data/pm-masters   (PM Master page, legacy docs/17)
+  "legacy": { "controller": "DataApi", "action": "getPMList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pm-masters" },
+
+  // strData=[{"strRtnPara":"[]","strCode":""}]. The legacy action reads strCode and never applies it; strRtnPara is the
+  // dialog layout of the page.
+  "queryJson": { "strData": { "strRtnPara": null, "strCode": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "All 13 PMMaster columns, in ORDER BY PMCode order on both sides. Money columns compare as numbers (46.0000 == 46)."
+}

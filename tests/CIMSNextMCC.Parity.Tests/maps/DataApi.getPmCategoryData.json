@@ -1,0 +1,13 @@
+{
+  // Legacy DataApi/getPmCategoryData -> GET api/v1/master-data/pm-masters/categories   (PM Master page, legacy docs/17)
+  "legacy": { "controller": "DataApi", "action": "getPmCategoryData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pm-masters/categories" },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "No parameters. select t1.* from PMCategories has no ORDER BY on either side (table order); the page selects the first row. PMStockDetails.js calls the same legacy action."
+}

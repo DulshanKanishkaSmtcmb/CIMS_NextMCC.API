@@ -2,7 +2,9 @@ using CIMSNextMCC.Application.Arrivals.ConfirmArrival;
 using CIMSNextMCC.Application.Common.Security;
 using CIMSNextMCC.Application.MasterData.Country;
 using CIMSNextMCC.Application.MasterData.DC;
+using CIMSNextMCC.Application.MasterData.PMMaster;
 using CIMSNextMCC.Application.MasterData.Ports;
+using CIMSNextMCC.Application.MasterData.ProductCategory;
 using CIMSNextMCC.Application.Reference.FieldCaptions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +40,15 @@ public static class DependencyInjection
         services.AddScoped<GetDcListHandler>();
         services.AddScoped<GetDcDataHandler>();
         services.AddScoped<SaveDcDataHandler>();
+
+        // Master data wave 1c: File/PMMaster, File/ProductCategory.
+        services.AddScoped<GetPmListHandler>();
+        services.AddScoped<GetPmDataHandler>();
+        services.AddScoped<GetPmCategoriesHandler>();
+        services.AddScoped<SavePmDataHandler>();
+        services.AddScoped<GetChainCodesHandler>();
+        services.AddScoped<GetChainRangesHandler>();
+        services.AddScoped<SaveChainCodeHandler>();
 
         return services;
     }

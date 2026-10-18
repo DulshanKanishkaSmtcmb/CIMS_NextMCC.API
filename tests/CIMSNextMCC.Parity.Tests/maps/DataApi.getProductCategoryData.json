@@ -1,0 +1,13 @@
+{
+  // Legacy DataApi/getProductCategoryData -> GET api/v1/master-data/product-categories/ranges   (Product Category page, legacy docs/17)
+  "legacy": { "controller": "DataApi", "action": "getProductCategoryData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/product-categories/ranges" },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "No parameters. select t1.* from ContractsChainCodesCategory has no ORDER BY on either side (table order); the page selects the first row as the Range."
+}
