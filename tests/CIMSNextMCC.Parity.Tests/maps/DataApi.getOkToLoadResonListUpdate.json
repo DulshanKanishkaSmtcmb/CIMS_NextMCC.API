@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getOkToLoadResonListUpdate -> GET api/v1/master-data/ok-to-load-reasons?dc=&checkAllocation=   (OK-to-Load Reason page, legacy docs/18)
+  "legacy": { "controller": "DataApi", "action": "getOkToLoadResonListUpdate", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/ok-to-load-reasons" },
+
+  // strData=[{"uid":"x","DC":"Zalora Online","chkAllocated":true,"strRtnPara":"[]"}]
+  "queryJson": { "strData": { "uid": null, "DC": "dc", "chkAllocated": "checkAllocation", "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ], "columnMap": { "isAttched": "isAllocated" } },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "isAttched (sic) is the SQL alias of the allocation flag; the new property is isAllocated. An empty DC lists every DC's reasons on both sides. A DC with an apostrophe breaks the legacy SQL (ListTableLoad swallows the error and returns an empty table); the new API finds no row, so both sides are empty."
+}

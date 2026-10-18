@@ -2,6 +2,7 @@ using CIMSNextMCC.Application.Arrivals.ConfirmArrival;
 using CIMSNextMCC.Application.Common.Security;
 using CIMSNextMCC.Application.MasterData.Country;
 using CIMSNextMCC.Application.MasterData.DC;
+using CIMSNextMCC.Application.MasterData.OkToLoadReason;
 using CIMSNextMCC.Application.MasterData.PMMaster;
 using CIMSNextMCC.Application.MasterData.PmSupplier;
 using CIMSNextMCC.Application.MasterData.Ports;
@@ -68,6 +69,8 @@ public static class DependencyInjection
 
         // Master data wave 1d: File/RateCardEntry.
         services.AddScoped<GetRateCardHandler>();
+        services.AddScoped<GetOkToLoadReasonsHandler>();
+        services.AddScoped<ReplaceOkToLoadReasonsHandler>();
 
         return services;
     }
