@@ -1,0 +1,21 @@
+{
+  // Legacy DataApi/getRateInformation4Add -> GET api/v1/master-data/rate-cards   (Rate Card Entry page, legacy docs/18)
+  "legacy": { "controller": "DataApi", "action": "getRateInformation4Add", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/rate-cards" },
+
+  // strDataArr=[{"strOption":"Add","uid":"x"}]: the legacy action reads both and uses neither.
+  "queryJson": { "strDataArr": { "strOption": null, "uid": null } },
+
+  // dtMain = export clearance charges, dtDtl1 = export freight charges, dtDtl2 = CFS charges.
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain", "dtDtl1", "dtDtl2" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "clearance", "freight", "cfs" ] },
+
+  "options": {
+    // dtMain is a clone of the RateClearHaulageExport table, so its two audit columns are present and always null in the
+    // synthesized rows; the new rows carry only the container type and the rate.
+    "ignoreColumns": [ "rateUpdateBy", "rateUpdateDate" ]
+  },
+
+  "notes": "The legacy page sends this once per load. The CFS table is ordered by ChgCode only, so rows with the same ChgCode would come back in an unspecified order (the Test database has unique codes). ignoreColumns also drops the CFS rows' RateUpdateBy/RateUpdateDate on both sides (all null/empty in the Test database)."
+}

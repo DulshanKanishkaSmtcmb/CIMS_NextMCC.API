@@ -6,6 +6,7 @@ using CIMSNextMCC.Application.MasterData.PMMaster;
 using CIMSNextMCC.Application.MasterData.PmSupplier;
 using CIMSNextMCC.Application.MasterData.Ports;
 using CIMSNextMCC.Application.MasterData.ProductCategory;
+using CIMSNextMCC.Application.MasterData.RateCard;
 using CIMSNextMCC.Application.MasterData.Supplier;
 using CIMSNextMCC.Application.Reference.FieldCaptions;
 using FluentValidation;
@@ -64,6 +65,9 @@ public static class DependencyInjection
         services.AddScoped<GetPmSupplierListHandler>();
         services.AddScoped<GetPmSupplierDataHandler>();
         services.AddScoped<SavePmSupplierDataHandler>();
+
+        // Master data wave 1d: File/RateCardEntry.
+        services.AddScoped<GetRateCardHandler>();
 
         return services;
     }
