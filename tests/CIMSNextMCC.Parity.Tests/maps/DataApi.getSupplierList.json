@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getSupplierList -> GET api/v1/master-data/suppliers   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getSupplierList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers" },
+
+  // strRtnPara=<which form field the chosen row fills> (a page detail; the data does not depend on it).
+  "query": { "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "All 21 Shipper columns, in ORDER BY ShipperCode order on both sides."
+}

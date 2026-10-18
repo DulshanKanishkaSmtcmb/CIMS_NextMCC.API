@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getAirShipperData -> GET api/v1/master-data/suppliers/air-shippers/{code}   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getAirShipperData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers/air-shippers/{code}" },
+
+  // strData=[{"ShCode":"A1","strRtnPara":"[]"}]
+  "queryJson": { "strData": { "ShCode": "code", "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "Reads [AirFreight].dbo.Shipper (ShCode, ShName) on the Air connection. No golden inputs, see getAirShipperList."
+}

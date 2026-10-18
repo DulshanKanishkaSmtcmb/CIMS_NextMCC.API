@@ -1,0 +1,15 @@
+{
+  // Legacy DataApi/getSeaShipperList -> GET api/v1/master-data/suppliers/sea-shippers   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getSeaShipperList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers/sea-shippers" },
+
+  "query": { "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "Reads [SeaFreight].dbo.Shipper (ShCode, ShName, ShAdd1..4) on the Sea connection, a separate system. No golden inputs: the Test environment has no Sea database (legacy answers an empty table, the API a 503), so there is nothing to compare; covered by unit tests."
+}

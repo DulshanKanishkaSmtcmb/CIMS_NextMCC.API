@@ -3,8 +3,10 @@ using CIMSNextMCC.Application.Common.Security;
 using CIMSNextMCC.Application.MasterData.Country;
 using CIMSNextMCC.Application.MasterData.DC;
 using CIMSNextMCC.Application.MasterData.PMMaster;
+using CIMSNextMCC.Application.MasterData.PmSupplier;
 using CIMSNextMCC.Application.MasterData.Ports;
 using CIMSNextMCC.Application.MasterData.ProductCategory;
+using CIMSNextMCC.Application.MasterData.Supplier;
 using CIMSNextMCC.Application.Reference.FieldCaptions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +51,19 @@ public static class DependencyInjection
         services.AddScoped<GetChainCodesHandler>();
         services.AddScoped<GetChainRangesHandler>();
         services.AddScoped<SaveChainCodeHandler>();
+
+        // Master data wave 1b: File/Supplier, File/PmSupplier.
+        services.AddScoped<GetSupplierListHandler>();
+        services.AddScoped<GetSupplierDataHandler>();
+        services.AddScoped<FindSupplierNameHandler>();
+        services.AddScoped<SaveSupplierDataHandler>();
+        services.AddScoped<GetAirShipperListHandler>();
+        services.AddScoped<GetAirShipperDataHandler>();
+        services.AddScoped<GetSeaShipperListHandler>();
+        services.AddScoped<GetSeaShipperDataHandler>();
+        services.AddScoped<GetPmSupplierListHandler>();
+        services.AddScoped<GetPmSupplierDataHandler>();
+        services.AddScoped<SavePmSupplierDataHandler>();
 
         return services;
     }

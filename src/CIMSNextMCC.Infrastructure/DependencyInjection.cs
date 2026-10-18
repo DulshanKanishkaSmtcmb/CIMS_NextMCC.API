@@ -42,6 +42,9 @@ public static class DependencyInjection
         services.AddScoped<IDcRepository, DcRepository>();
         services.AddScoped<IPackingMaterialRepository, PackingMaterialRepository>();
         services.AddScoped<IContractChainCodeRepository, ContractChainCodeRepository>();
+        services.AddScoped<ISupplierRepository, SupplierRepository>();
+        services.AddScoped<IFreightShipperRepository, FreightShipperRepository>();
+        services.AddScoped<IPmSupplierRepository, PmSupplierRepository>();
 
         // Legacy cookie bridge (docs/09 section 4.3); the cookie scheme itself is AddLegacyCookie. Deleted in Phase 4.
         services.AddScoped<ILegacyUserRepository, LegacyUserRepository>();

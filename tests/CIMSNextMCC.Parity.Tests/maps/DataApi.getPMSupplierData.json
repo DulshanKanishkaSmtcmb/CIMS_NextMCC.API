@@ -1,0 +1,17 @@
+{
+  // Legacy DataApi/getPMSupplierData -> GET api/v1/master-data/pm-suppliers/{code}   (PM Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getPMSupplierData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pm-suppliers/{code}" },
+
+  // strData=[{"PMSupplierCode":"A0001","strRtnPara":"[]"}]. The legacy action reads the FIRST property of the object by
+  // position, so the existence check can send the code under a misspelt name ("PMSuplierCode") and "strCodeType":"Code".
+  "queryJson": { "strData": { "PMSupplierCode": "code", "PMSuplierCode": "code", "strRtnPara": null, "strCodeType": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "An empty code cannot be replayed (an empty route segment is the list endpoint); the page never sends one. A code longer than the column (5) is a 400 on the API where legacy returned an empty table."
+}

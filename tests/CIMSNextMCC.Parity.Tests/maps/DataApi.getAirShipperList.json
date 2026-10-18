@@ -1,0 +1,15 @@
+{
+  // Legacy DataApi/getAirShipperList -> GET api/v1/master-data/suppliers/air-shippers   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getAirShipperList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers/air-shippers" },
+
+  "query": { "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "Reads [AirFreight].dbo.Shipper (ShCode, ShName, ShAdd1..4) on the Air connection, a separate system. No golden inputs: the Test environment has no Air database (legacy answers an empty table, the API a 503), so there is nothing to compare; covered by unit tests."
+}

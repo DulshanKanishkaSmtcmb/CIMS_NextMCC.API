@@ -1,0 +1,15 @@
+{
+  // Legacy DataApi/findSupplierName -> GET api/v1/master-data/suppliers/search   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "findSupplierName", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers/search" },
+
+  "query": { "strName": "name", "isStartChrOnly": "startsWith", "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "ShipperCode, ShipperName and ShipperAddress1..4, ordered by ShipperName on both sides."
+}

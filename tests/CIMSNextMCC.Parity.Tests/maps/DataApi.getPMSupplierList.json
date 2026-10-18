@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getPMSupplierList -> GET api/v1/master-data/pm-suppliers   (PM Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getPMSupplierList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pm-suppliers" },
+
+  // strRtnPara=<which form field the chosen row fills> (a page detail; the data does not depend on it).
+  "query": { "strRtnPara": null },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "All 13 PMSupplier columns, in ORDER BY PMSupplierCode order on both sides."
+}

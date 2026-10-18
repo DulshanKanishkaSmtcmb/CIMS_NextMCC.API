@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getSeaShipperData -> GET api/v1/master-data/suppliers/sea-shippers/{code}   (Supplier master page, legacy docs/16)
+  "legacy": { "controller": "DataApi", "action": "getSeaShipperData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/suppliers/sea-shippers/{code}" },
+
+  // strData=[{"ShCode":"A1","strRtnPara":"[]"}]
+  "queryJson": { "strData": { "ShCode": "code", "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "Reads [SeaFreight].dbo.Shipper (ShCode, ShName) on the Sea connection. No golden inputs, see getSeaShipperList."
+}
