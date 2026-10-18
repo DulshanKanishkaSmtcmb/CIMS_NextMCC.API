@@ -1,0 +1,38 @@
+{
+  // Legacy DataApi/getPendingPO4ConfirmArrival -> GET api/v1/arrivals/confirm/pending   (Confirm Arrivals pilot, legacy docs/13)
+  "legacy": { "controller": "DataApi", "action": "getPendingPO4ConfirmArrival", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/arrivals/confirm/pending" },
+
+  // strData=[{"strMode":"Sea","strArrivalDate":"","strCountry":"All","uid":"x","strDC":"All","strCargoFrom":"Import"}].
+  // strMode, strArrivalDate and uid are parsed by the legacy action but never used.
+  "queryJson": {
+    "strData": {
+      "strCargoFrom": "cargoFrom",
+      "strDC": "dc",
+      "strCountry": "country",
+      "strMode": null,
+      "strArrivalDate": null,
+      "uid": null
+    }
+  },
+
+  // dtMain = contracts, dtDtl1 = suppliers, dtDtl2 = containers.
+  "legacyShape": {
+    "kind": "dataRtnCls",
+    "tables": [ "dtMain", "dtDtl1", "dtDtl2" ],
+    "columnMap": { "loadRerence": "loadReference" }
+  },
+  "newShape": { "kind": "rows", "rowsPaths": [ "contracts", "suppliers", "containers" ] },
+
+  "options": {
+    // Legacy formats a missing ArriveDate / InboundBookingDate as "" (the new API returns null), and ShipperName is null
+    // on both sides when the Shipper row is missing.
+    "nullAsEmpty": true,
+    // inboundVesselOrderNo1: legacy selects InboundVesselOrderNo twice (DataTable renames the copy).
+    // country: new only; the legacy query never selected it, so the legacy grid column was blank (docs/13 Q1).
+    "ignoreColumns": [ "inboundVesselOrderNo1", "country" ]
+  },
+
+  "notes": "dtDtl1/dtDtl2 have no ORDER BY in legacy; the new SQL orders them by their own columns, which matches the DISTINCT sort SQL Server produces today. If a run reports an order-only difference in suppliers or containers, that is the reason (rows are equal)."
+}

@@ -1,0 +1,19 @@
+{
+  // Legacy DataApi/getCountryList -> GET api/v1/arrivals/confirm/countries   (Confirm Arrivals pilot, legacy docs/13)
+  "legacy": { "controller": "DataApi", "action": "getCountryList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/arrivals/confirm/countries" },
+
+  // strData=[{"CountryCode":"","strRtnPara":"[]"}]. The legacy action builds a CountryCode filter and never applies it.
+  "queryJson": { "strData": { "CountryCode": null, "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {
+    // Legacy returns select t1.* from Country; the page reads CountryCode and CountryName.
+    "ignoreColumns": [ "CargoMovement", "DateEnter", "EnterBy", "DateUpdate", "UpdateBy", "ContractBlock" ]
+  },
+
+  "notes": "Compares CountryCode and CountryName in order (ORDER BY CountryCode on both sides)."
+}

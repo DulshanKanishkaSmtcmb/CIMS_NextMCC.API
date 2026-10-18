@@ -1,3 +1,4 @@
+using CIMSNextMCC.Application.Arrivals.ConfirmArrival;
 using CIMSNextMCC.Application.Reference.FieldCaptions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,12 @@ public static class DependencyInjection
 
         // One handler per endpoint.
         services.AddScoped<GetFieldCaptionsHandler>();
+
+        // Arrivals / Confirm Arrival (legacy Data/ConfirmArrival).
+        services.AddScoped<GetConfirmArrivalDcsHandler>();
+        services.AddScoped<GetConfirmArrivalCountriesHandler>();
+        services.AddScoped<GetPendingArrivalsHandler>();
+        services.AddScoped<ConfirmArrivalHandler>();
 
         return services;
     }

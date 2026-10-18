@@ -1,10 +1,12 @@
 using System.Data;
 using CIMSNextMCC.Application.Interfaces.Common;
+using CIMSNextMCC.Application.Interfaces.Repositories.Arrivals;
 using CIMSNextMCC.Application.Interfaces.Repositories.Reference;
 using CIMSNextMCC.Application.Interfaces.Repositories.Security;
 using CIMSNextMCC.Domain.Tenancy;
 using CIMSNextMCC.Infrastructure.Data;
 using CIMSNextMCC.Infrastructure.Identity;
+using CIMSNextMCC.Infrastructure.Repositories.Arrivals;
 using CIMSNextMCC.Infrastructure.Repositories.Reference;
 using CIMSNextMCC.Infrastructure.Repositories.Security;
 using CIMSNextMCC.Infrastructure.Tenancy;
@@ -32,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IFieldCaptionsRepository, FieldCaptionsRepository>();
+        services.AddScoped<IConfirmArrivalRepository, ConfirmArrivalRepository>();
 
         // Legacy cookie bridge (docs/09 section 4.3); the cookie scheme itself is AddLegacyCookie. Deleted in Phase 4.
         services.AddScoped<ILegacyUserRepository, LegacyUserRepository>();

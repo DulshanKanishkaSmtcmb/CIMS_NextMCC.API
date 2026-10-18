@@ -1,0 +1,28 @@
+{
+  // Legacy DataApi/getDCList -> GET api/v1/arrivals/confirm/dcs   (Confirm Arrivals pilot, legacy docs/13)
+  // Other pages also call getDCList; when they are ported they may need more DestWarehouse columns (then widen the new
+  // endpoint or add a reference endpoint and move this map).
+  "legacy": { "controller": "DataApi", "action": "getDCList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/arrivals/confirm/dcs" },
+
+  // strData=[{"WhDes":"","strRtnPara":"[]"}]. The legacy action builds a WhDes filter and never applies it.
+  "queryJson": { "strData": { "WhDes": null, "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {
+    // Legacy returns select t1.* from DestWarehouse; the Confirm Arrivals page reads only WhDes.
+    "ignoreColumns": [
+      "WhCode", "WhDesMain", "CountryCode", "LoadingOrder", "OuterLabel", "EANLabelScan", "ReworkApply", "RFIDPriceTag",
+      "RFIDPriceTagValidate", "RemoveOriginalTag", "JokerTagsForSets", "CareWarningLabel", "PreValidationRun",
+      "EANLabelOuterBox", "EANDesCol", "PackAdditionalBox", "BoxPMCode", "HangerUse", "EANLabelPiece", "PostValidation",
+      "StockUpdate", "AuthorizedToPOPlan", "ItemOptionFixedLength", "ItemOptionManual", "PriceSymble", "PrintPriceTag",
+      "BoxPackSeperate", "StorePick", "IsRfidOrder", "BrandText", "BarcodeType", "ProductCategory", "VasCheck",
+      "EnaVerification", "EanLblType", "Address", "LpnLblType"
+    ]
+  },
+
+  "notes": "Compares WhDes in order (ORDER BY WhDes on both sides)."
+}
