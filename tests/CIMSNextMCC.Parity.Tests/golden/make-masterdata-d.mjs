@@ -83,3 +83,52 @@ reasons('Zalora Online', true, 'Zalora with an empty user', '');
 
 writeFileSync(join(here, 'oktoloadreason.jsonl'), `${ok.join('\n')}\n`);
 console.log(`oktoloadreason.jsonl: ${ok.length} inputs`);
+
+// ---------------------------------------------------------------- Pallet Rack Build / Pallet Rack Build Arrangement
+// Both legacy pages call the same two reads, so they share the golden file.
+const pr = [];
+// getPalletRacksList: strRtnPara is the layout of the "Pallets Area Listing" dialog (RtnArr of the modules), echoed back only.
+const rackLayout = JSON.stringify([
+  { ele: 'RackNo', val: 'rackNo', eleType: 'val' },
+  { ele: 'NofRows', val: 'nofRows', eleType: 'val' },
+  { ele: 'NofLayers', val: 'nofLayers', eleType: 'val' },
+  { ele: 'TotPltPositions', val: 'nofPositions', eleType: 'val' },
+]);
+for (const [layout, why] of [
+  [rackLayout, 'The page call: the dialog layout of PalletRackBuild.js / PalletRackBuildArr.js'],
+  ['[]', 'Empty layout'],
+  ['', 'No layout at all'],
+  [rackLayout.replace('RackNo', 'RackNo2'), 'A different layout'],
+  ['null', 'The text null'],
+  ['x'.repeat(300), 'A very long layout'],
+  ["[{'bad':1}]", 'Not JSON, with apostrophes'],
+  ['[{"ele":"RackNo","val":"rackNo","eleType":"val"}]', 'One column only'],
+  ['{}', 'An object'],
+  ['All', 'Text'],
+]) {
+  pr.push(strData('getPalletRacksList', { strRtnPara: layout }, why));
+}
+pr.push(line('getPalletRacksList', `strData=${encodeURIComponent(JSON.stringify([{ strRtnPara: rackLayout }]))}&_=1760000000401`, 'The page call with the jQuery cache buster'));
+// getPalletRacksData: [why, rackNo, strOption]. The pages send {RackNo, strRtnPara "[]", strOption "All"}.
+for (const [why, rackNo, option] of [
+  ['The page default rack, as the Load and existence-check calls send it', 'A35', 'All'],
+  ['Lower-case rack number (column collation)', 'a35', 'All'],
+  ['Trailing space (SQL ignores it)', 'A35 ', 'All'],
+  ['Leading space: no such rack', ' A35', 'All'],
+  ['Prefix of the rack number', 'A3', 'All'],
+  ['A position number is not a rack number', 'A35-01-01', 'All'],
+  ['Unknown rack', 'ZZZ', 'All'],
+  ['Unknown rack, a digit', '35', 'All'],
+  ['Another rack that does not exist', 'B1', 'All'],
+  ['Apostrophe: the legacy SQL breaks and returns empty tables', "A'35", 'All'],
+  ['Longer than the column', 'ABCDEFGHIJKLMNOP', 'All'],
+  ['A SQL wildcard is not a wildcard in an equality', 'A3%', 'All'],
+  ['Any non-empty option returns the positions', 'A35', 'Positions'],
+  ['A space is a non-empty option too', 'A35', ' '],
+  ['Rack number with a hyphen', 'A-35', 'All'],
+]) {
+  pr.push(strData('getPalletRacksData', { RackNo: rackNo, strRtnPara: '[]', strOption: option }, why));
+}
+
+writeFileSync(join(here, 'palletrack.jsonl'), `${pr.join('\n')}\n`);
+console.log(`palletrack.jsonl: ${pr.length} inputs`);

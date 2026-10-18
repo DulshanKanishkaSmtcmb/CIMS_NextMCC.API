@@ -1,0 +1,16 @@
+{
+  // Legacy DataApi/getPalletRacksList -> GET api/v1/master-data/pallet-racks   (Pallet Rack Build / Build Arrangement pages, legacy docs/18)
+  "legacy": { "controller": "DataApi", "action": "getPalletRacksList", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pallet-racks" },
+
+  // strData=[{"strRtnPara":"<the dialog's return layout>"}]: only echoed back in the legacy envelope.
+  "queryJson": { "strData": { "strRtnPara": null } },
+
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "" ] },
+
+  "options": {},
+
+  "notes": "select t1.* from PalletRacks t1 Order By t1.RackNo. All four columns are compared. The Test database holds one rack (A35)."
+}

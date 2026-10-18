@@ -1,0 +1,19 @@
+{
+  // Legacy DataApi/getPalletRacksData -> GET api/v1/master-data/pallet-racks/{rackNo}   (Pallet Rack Build / Build Arrangement pages, legacy docs/18)
+  "legacy": { "controller": "DataApi", "action": "getPalletRacksData", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/master-data/pallet-racks/{rackNo}" },
+
+  // strData=[{"RackNo":"A35","strRtnPara":"[]","strOption":"All"}]. The legacy action returns dtDtl1 (the positions) only when
+  // strOption is not empty; the pages always send "All" and the new endpoint always returns them, so every golden input has a
+  // non-empty strOption (the new `positions=false` switch has no legacy counterpart worth replaying).
+  "queryJson": { "strData": { "RackNo": "rackNo", "strRtnPara": null, "strOption": null } },
+
+  // dtMain = the rack (0 or 1 rows), dtDtl1 = its positions in table order.
+  "legacyShape": { "kind": "dataRtnCls", "tables": [ "dtMain", "dtDtl1" ] },
+  "newShape": { "kind": "rows", "rowsPaths": [ "rack", "positions" ], "singleRow": true },
+
+  "options": {},
+
+  "notes": "An unknown rack answers 200 with a null rack and no positions (legacy: two empty tables), so singleRow turns the null rack into an empty table. The positions have no ORDER BY on either side (table order). An empty rackNo cannot be replayed (an empty route segment is the list endpoint); the golden inputs avoid it."
+}

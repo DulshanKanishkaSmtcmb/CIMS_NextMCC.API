@@ -3,6 +3,7 @@ using CIMSNextMCC.Application.Common.Security;
 using CIMSNextMCC.Application.MasterData.Country;
 using CIMSNextMCC.Application.MasterData.DC;
 using CIMSNextMCC.Application.MasterData.OkToLoadReason;
+using CIMSNextMCC.Application.MasterData.PalletRack;
 using CIMSNextMCC.Application.MasterData.PMMaster;
 using CIMSNextMCC.Application.MasterData.PmSupplier;
 using CIMSNextMCC.Application.MasterData.Ports;
@@ -71,6 +72,9 @@ public static class DependencyInjection
         services.AddScoped<GetRateCardHandler>();
         services.AddScoped<GetOkToLoadReasonsHandler>();
         services.AddScoped<ReplaceOkToLoadReasonsHandler>();
+        services.AddScoped<GetPalletRackListHandler>();
+        services.AddScoped<GetPalletRackDataHandler>();
+        services.AddScoped<CreatePalletRackHandler>();
 
         return services;
     }
