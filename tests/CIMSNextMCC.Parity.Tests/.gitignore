@@ -1,0 +1,3 @@
+# Recorded legacy responses hold real data: never commit them.
+recordings/
+TestResults/

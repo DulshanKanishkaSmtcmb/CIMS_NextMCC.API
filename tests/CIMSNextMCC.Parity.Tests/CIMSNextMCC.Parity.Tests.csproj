@@ -15,4 +15,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- Endpoint maps travel with the test assembly (docs/12-parity-harness.md). -->
+  <ItemGroup>
+    <None Include="maps\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

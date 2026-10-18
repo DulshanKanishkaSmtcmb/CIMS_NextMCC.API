@@ -1,20 +1,34 @@
+using CIMSNextMCC.Parity.Tests.Harness;
+
 namespace CIMSNextMCC.Parity.Tests;
 
+/// <summary>
+/// Golden-master reads (docs/09-modernization-plan.md section 5, docs/12-parity-harness.md).
+///
+/// Skipped unless PARITY_LEGACY_URL and PARITY_NEW_URL are set (both must be localhost). Then it replays every call
+/// recorded by the legacy ParityRecorder (PARITY_RECORDINGS, default tests/CIMSNextMCC.Parity.Tests/recordings) against the
+/// legacy app and the new API, writes TestResults/parity-report.md and FAILS on any difference or error. Calls whose endpoint
+/// map says "not-ported" are listed as pending and do not fail the test.
+/// </summary>
 public class GoldenMasterReadTests
 {
-    // Golden-master approach (docs/09-modernization-plan.md section 5, "Golden-master reads"):
-    //   1. A recorder middleware in the LEGACY app captures real (endpoint, query string, user) -> response pairs
-    //      from the usage log. Those recordings are the golden master.
-    //   2. For every recorded input this test replays the request against the old endpoint and the new one, both
-    //      running on a restored copy of the tenant's production database (SQL Server test instance, optionally anonymized).
-    //   3. Both responses are normalized (column order, number and date formats, trims) and the ROW CONTENT is diffed;
-    //      the envelope shape (DataRtnCls vs typed DTO) is deliberately not compared.
-    //   4. Run it once per tenant database. Write endpoints get a separate "write effect" test (snapshot, call old,
-    //      reset with Respawn, call new, diff the deltas), not this one.
-    // The first replay will be field-captions: legacy DataApi/getfldParas vs GET api/v1/reference/field-captions
-    // (legacy returns a positional array with Item/PO/Delivery crossed, see GetFieldCaptionsHandler).
-    [Fact(Skip = "Placeholder: needs the legacy recorder, a restored tenant database and a running old + new pair.")]
-    public void New_read_endpoints_return_the_same_rows_as_the_legacy_endpoints()
+    [ParityLiveFact]
+    public async Task New_read_endpoints_return_the_same_data_as_the_legacy_endpoints()
     {
+        var recordingsPath = ParityEnvironment.RecordingsPath;
+        var recorded = RecordedCallReader.ReadPath(recordingsPath);
+        Assert.True(recorded.Count > 0, $"No recorded calls found in '{recordingsPath}'. Record some first (docs/12-parity-harness.md).");
+
+        var maps = EndpointMapSet.LoadFromDirectory(ParityEnvironment.MapsPath);
+        using var runner = new ParityRunner(ParityEnvironment.ToOptions(), maps);
+
+        var run = await runner.RunAsync(recorded);
+        ParityReport.Write(run, ParityEnvironment.ReportPath);
+
+        var failures = run.Results.Where(r => r.Outcome is ParityOutcome.Different or ParityOutcome.Error).ToList();
+        Assert.True(
+            failures.Count == 0,
+            $"{failures.Count} of {run.Results.Count} distinct call(s) differ or failed; see {ParityEnvironment.ReportPath}.{Environment.NewLine}"
+            + string.Join(Environment.NewLine, failures.Select(f => $"  {f.Outcome}: {f.Call.PathAndQuery}  {f.Detail}")));
     }
 }

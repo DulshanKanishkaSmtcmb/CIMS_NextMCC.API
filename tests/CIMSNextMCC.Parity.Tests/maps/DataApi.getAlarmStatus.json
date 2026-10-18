@@ -1,0 +1,6 @@
+{
+  // Legacy DataApi/getAlarmStatus?Alarmid=... returns the int AlarmDevice.DeviceStatus. No replacement endpoint yet.
+  "legacy": { "controller": "DataApi", "action": "getAlarmStatus", "method": "GET" },
+  "status": "not-ported",
+  "notes": "Not ported: no replacement endpoint yet. Recorded calls are listed as pending."
+}

@@ -1,0 +1,21 @@
+{
+  // Legacy DataApi/getfldParas -> GET api/v1/reference/field-captions   (docs/12-parity-harness.md, "Endpoint maps")
+  "legacy": { "controller": "DataApi", "action": "getfldParas", "method": "GET" },
+  "status": "ported",
+  "new": { "method": "GET", "route": "api/v1/reference/field-captions" },
+
+  // Query parameters: legacy name -> new name; null drops it. The legacy action takes none; pages send uid.
+  "query": { "uid": null },
+
+  // Legacy returns a positional string[5]. clsDBUtility.strFldCaptions crosses three columns, so the names below are
+  // the COLUMNS the values come from, not the positions' apparent meaning:
+  //   [0] SysCaption  [1] ContractNoCaption  [2] PONoCaption  [3] DeliveryNoCaption  [4] ItemNoCaption
+  // The new API returns the same five values under the property of the same column name.
+  "legacyShape": {
+    "kind": "positionalArray",
+    "names": [ "sysCaption", "contractNoCaption", "poNoCaption", "deliveryNoCaption", "itemNoCaption" ]
+  },
+  "newShape": { "kind": "json" },
+
+  "notes": "Compares values by source column. If dbo.FldCaptions has no row the legacy fallbacks are positional (Item/PO/Delivery defaults land in the crossed slots) and this map will report a difference; that is a real legacy quirk, see GetFieldCaptionsHandler."
+}
