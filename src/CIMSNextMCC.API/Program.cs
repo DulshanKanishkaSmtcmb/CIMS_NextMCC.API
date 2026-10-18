@@ -92,6 +92,7 @@ try
     if (builder.Environment.IsDevelopment())
     {
         authentication.AddDevJwt(RequireScope);
+        builder.Services.AddDevToken();
     }
 
     builder.Services.AddAuthorization(options =>
@@ -128,6 +129,11 @@ try
 
     app.UseSerilogRequestLogging();
     app.UseRouting();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseRateLimiter();
+    }
 
     var allowedOrigins = app.Configuration
         .GetSection("Cors:AllowedOrigins")
@@ -166,6 +172,12 @@ try
     }).AllowAnonymous();
 
     app.MapControllers();
+
+    if (app.Environment.IsDevelopment())
+    {
+        // Mints dev tokens for the SPA's sign-in page; loopback only, see DevTokenEndpoint.
+        app.MapDevToken();
+    }
 
     app.Run();
 }

@@ -7,7 +7,8 @@
   a. /Data/ConfirmArrival: legacy without the pilot cookie, the SPA index.html with cims_pilot=1; /pilot/on and
      /pilot/off set and clear the cookie; deep links to SPA paths answer index.html.
   b. /assets/* from nginx with the one-year immutable cache; a missing asset is a 404, never index.html.
-  c. /api/v1/reference/field-captions: 401 without a token, 200 with a DevJwt token.
+  c. /api/v1/reference/field-captions: 401 without a token, 200 with a DevJwt token; POST /api/v1/dev/token (the
+     sign-in page's "Get dev token") mints a token for the user that works the same, and 404s an unknown user.
   d. POST /api/v1/legacy-session with the token sets .AspNet.ApplicationCookie for localhost (no Domain, Path=/,
      HttpOnly, SameSite=Lax, not Secure); /Home/Index with it is 200 from the legacy app.
   e. legacy Web API through the gateway with that cookie: getCloudMenuItems (uid from the page) and getQCPendingCount
@@ -56,9 +57,10 @@ $handler.CookieContainer = $jar; $handler.UseCookies = $true; $handler.AllowAuto
 $http = New-Object System.Net.Http.HttpClient $handler
 $http.Timeout = [TimeSpan]::FromMinutes(5)
 
-function Send([string] $method, [string] $path, [string] $bearer) {
+function Send([string] $method, [string] $path, [string] $bearer, [string] $jsonBody) {
     $request = New-Object System.Net.Http.HttpRequestMessage -ArgumentList ([System.Net.Http.HttpMethod]::new($method)), ($gw + $path)
     if ($bearer) { $request.Headers.Authorization = New-Object System.Net.Http.Headers.AuthenticationHeaderValue 'Bearer', $bearer }
+    if ($jsonBody) { $request.Content = New-Object System.Net.Http.StringContent -ArgumentList $jsonBody, ([Text.Encoding]::UTF8), 'application/json' }
     $response = $http.SendAsync($request).GetAwaiter().GetResult()
     $bytes = $response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult()
     $values = $null
@@ -148,6 +150,18 @@ try {
     Check 'c2' 'GET /api/v1/reference/field-captions with a DevJwt token -> 200' ($r.Status -eq 200 -and $r.ContentType -match 'json') "HTTP $($r.Status), $($r.Length) bytes"
     $r = Send 'GET' '/api/v1/arrivals/confirm/dcs' $token
     Check 'c3' 'GET /api/v1/arrivals/confirm/dcs (the pilot page''s lookup) -> 200' ($r.Status -eq 200) "HTTP $($r.Status), $($r.Length) bytes"
+
+    # The sign-in page's "Get dev token": the API mints the token itself (Development only, loopback only).
+    $r = Send 'POST' '/api/v1/dev/token' $null (@{ username = $UserName; validForHours = 1 } | ConvertTo-Json -Compress)
+    $minted = $null; try { $minted = ($r.Body | ConvertFrom-Json).token } catch { }
+    Check 'c4' "POST /api/v1/dev/token for $UserName -> 200 with a token" ($r.Status -eq 200 -and $r.ServedBy -eq 'api' -and $minted) "HTTP $($r.Status), served by $($r.ServedBy)$(if ($r.Status -ne 200) { ", body: $($r.Body)" })"
+    if ($minted) {
+        $r = Send 'GET' '/api/v1/reference/field-captions' $minted
+        Check 'c5' 'GET /api/v1/reference/field-captions with the minted token -> 200' ($r.Status -eq 200 -and $r.ContentType -match 'json') "HTTP $($r.Status), $($r.Length) bytes"
+    }
+    else { Check 'c5' 'GET /api/v1/reference/field-captions with the minted token -> 200' $false 'no token from c4' }
+    $r = Send 'POST' '/api/v1/dev/token' $null '{"username":"no-such-user-devgw"}'
+    Check 'c6' 'POST /api/v1/dev/token for an unknown user -> 404 "unknown user"' ($r.Status -eq 404 -and $r.Body -match 'unknown user') "HTTP $($r.Status)"
 
     # ---------- d. cookie bridge through the gateway ----------
     Write-Host '== d. One login: legacy cookie from the API, accepted by the legacy app'

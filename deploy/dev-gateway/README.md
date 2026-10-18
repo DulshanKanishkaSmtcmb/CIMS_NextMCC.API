@@ -30,7 +30,8 @@ Start switches: `-SkipSpaBuild`, `-SkipLegacyBuild`, `-SkipApiBuild` (reuse the 
 A component that already answers is left running; nginx is reloaded (`-s reload`) instead of restarted.
 
 Then, in a browser: `http://localhost:8080/Home/Index` → legacy redirects to `/Account/Login?ReturnUrl=...` (the SPA) →
-paste the token under **Use dev token** → back on the legacy page, signed in. `http://localhost:8080/pilot/on` → now
+type your user name and press **Get dev token** (the API mints the token; Development and loopback only, no shell
+command needed; or paste a token from `new-dev-token.ps1` under **Use dev token**) → back on the legacy page, signed in. `http://localhost:8080/pilot/on` → now
 `/Data/ConfirmArrival` is the React page; `/pilot/off` goes back to the legacy one.
 
 ## What start-dev-gateway.ps1 does
